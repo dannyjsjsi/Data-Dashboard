@@ -1,0 +1,41 @@
+- name: Hostname CPU_Usage Memory_Usage Disk_Usage
+  hosts: lyh
+  become: no
+  remote_user: root
+  gather_facts: no
+  tasks:
+    - name: Install required packages
+      become: yes
+      package:
+        name: iperf3
+        state: present
+
+    - name: Start iperf3 server
+      become: yes
+      shell: iperf3 -s -D || true  # 加上 || true 防止重复启动报错
+      async: 30
+      poll: 0
+
+    - name: Get system metrics and network bandwidth
+      shell: |
+        CPU_Usage=$(top -bn1 | sed -n '3p' | awk '{print $2+$4}')
+        Memory_Usage=$(free -m | awk 'NR==2{printf"%s/%sMB (%.2f%%)\n", $3,$2,$3*100/$2 }')
+        Disk_Usage=$(df -hT | grep -w "/" | grep -v 192.168 | awk '{print $6}')
+        Hostname=$(hostname)
+        Internal_IP=$(ip route get 1 | awk '{print $NF;exit}')
+        Iperf_Output=$(iperf3 -c $Internal_IP -t 10)
+        Sender_Bandwidth=$(echo "$Iperf_Output" | grep 'sender' | awk '{print $7}')
+        Receiver_Bandwidth=$(echo "$Iperf_Output" | grep 'receiver' | awk '{print $7}')
+        
+        echo "CPU_Usage: ${CPU_Usage}%"
+        echo "Memory_Usage: ${Memory_Usage}"
+        echo "Disk_Usage: ${Disk_Usage}"
+        echo "Hostname: ${Hostname}"
+        echo "Sender Bandwidth: ${Sender_Bandwidth} Gbits/sec"
+        echo "Receiver Bandwidth: ${Receiver_Bandwidth} Gbits/sec"
+      register: metrics_output
+
+    - name: Parse and display metrics
+      debug:
+        msg: "{{ metrics_output.stdout_lines }}"
+

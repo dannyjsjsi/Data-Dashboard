@@ -1,0 +1,29 @@
+
+PLAY [Hostname CPU_Usage Memory_Usage Disk_Usage] ******************************
+
+TASK [Install required packages] ***********************************************
+ok: [192.168.202.139]
+fatal: [192.168.202.136]: UNREACHABLE! => {"changed": false, "msg": "Failed to connect to the host via ssh: ssh: connect to host 192.168.202.136 port 22: No route to host", "unreachable": true}
+
+TASK [Start iperf3 server] *****************************************************
+changed: [192.168.202.139]
+
+TASK [Get system metrics and network bandwidth] ********************************
+changed: [192.168.202.139]
+
+TASK [Parse and display metrics] ***********************************************
+ok: [192.168.202.139] => {
+    "msg": [
+        "CPU_Usage: 8.8%", 
+        "Memory_Usage: 838/1819MB (46.07%)", 
+        "Disk_Usage: 14%", 
+        "Hostname: localhost.localdomain", 
+        "Sender Bandwidth: 67.1 Gbits/sec", 
+        "Receiver Bandwidth: 67.1 Gbits/sec"
+    ]
+}
+
+PLAY RECAP *********************************************************************
+192.168.202.136            : ok=0    changed=0    unreachable=1    failed=0    skipped=0    rescued=0    ignored=0   
+192.168.202.139            : ok=4    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+
