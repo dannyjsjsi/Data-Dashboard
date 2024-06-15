@@ -50,7 +50,7 @@ yum install httpd -y
 
 ![Snipaste_2024-06-15_13-20-18](E:\华为\HICA\pic\Snipaste_2024-06-15_13-20-18.png)
 
-	#### 1、IP信息
+#### 1、IP信息
 
 #### 2、机器名
 
